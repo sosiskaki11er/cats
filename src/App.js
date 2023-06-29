@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import axios from 'axios'
+import { useState } from "react";
 import styled from 'styled-components'
 import Img from "./components/Img";
 import GetCat from "./components/GetCat";
