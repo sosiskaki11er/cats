@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import axios from 'axios'
+import styled from 'styled-components'
+import Img from "./components/Img";
+import GetCat from "./components/GetCat";
+import Checkboxes from "./components/Checkboxes";
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  max-width:500px;
+  margin:100px auto;
+  gap:20px;
+`
 
 function App() {
+  const [enabled, setEnabled] = useState(true)
+  const [auto, setAuto] = useState(false)
+  const [autoRefresh, setAutorefresh] = useState()
+  const [img, setImg] = useState('data:image/jpeg;base64,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')
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Wrapper>
+      <Checkboxes auto={auto} setAuto={setAuto} enabled={enabled} setEnabled={setEnabled} autoRefresh={autoRefresh} setAutorefresh={setAutorefresh} setImg={setImg}/>
+
+      <GetCat enabled={enabled} setImg={setImg}/>
+
+      <Img src={img}/>
+    </Wrapper>
   );
 }
 
